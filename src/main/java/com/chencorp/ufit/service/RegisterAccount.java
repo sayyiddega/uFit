@@ -8,7 +8,6 @@ import com.chencorp.ufit.repository.AccountRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
@@ -25,10 +24,13 @@ public class RegisterAccount {
     @Autowired
     private AccountRepository accountRepository;
 
+    @Autowired
+    private HashedPassword hashedPassword; // Injected HashedPassword
 
     public String register(String username, String password, String nama_depan, String nama_belakang, String gender,
-                        LocalDate birthdate, String birthplace, String phone, String email) {
+                           LocalDate birthdate, String birthplace, String phone, String email) {
 
+        // Check if the user or phone already exists
         Optional<User> optionalUser = userRepository.findByUsername(username);
         Optional<Account> optionalEmail = accountRepository.findByPhone(phone);
 
@@ -39,11 +41,13 @@ public class RegisterAccount {
             return buildErrorResponse("No Telp Sudah Terdaftar");
         }
 
-    
+        // Hash password using injected HashedPassword service
+        String hashedPasswordValue = hashedPassword.hashPassword(password);
+
         // Create and save the User
         User user = new User();
         user.setUsername(username);
-        user.setPassword(password);
+        user.setPassword(hashedPasswordValue);
         user.setLevel(1); // Default level
         user.setActive(1); // Default active status
         userRepository.save(user);

@@ -2,6 +2,7 @@ package com.chencorp.ufit.service;
 
 import com.chencorp.ufit.model.Token;
 import com.chencorp.ufit.model.User;
+import com.chencorp.ufit.service.HashedPassword;
 import com.chencorp.ufit.repository.TokenRepository;
 import com.chencorp.ufit.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -21,6 +22,11 @@ public class AuthService {
     @Autowired
     private TokenRepository tokenRepository;
 
+    
+    @Autowired
+    private HashedPassword hashedPassword;
+
+
     public String login(String username, String password) {
         Optional<User> optionalUser = userRepository.findByUsername(username);
         
@@ -30,7 +36,9 @@ public class AuthService {
 
         User user = optionalUser.get();
 
-        if (!user.getPassword().equals(password)) {
+        String hashedPasswordValue = hashedPassword.hashPassword(password);       
+
+        if (!user.getPassword().equals(hashedPasswordValue)) {
             return buildErrorResponse("Invalid password");
         }
         if (user.getActive() == null || user.getActive() == 0) {
