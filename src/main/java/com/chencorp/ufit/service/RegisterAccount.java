@@ -16,21 +16,21 @@ import java.util.Optional;
 public class RegisterAccount {
 
     @Autowired
-    private UserRepository userRepository;
+    private UserRepository userRepository; // Injek Repo User
 
     @Autowired
-    private TokenRepository tokenRepository;
+    private TokenRepository tokenRepository; // Injek Repo Token
 
     @Autowired
-    private AccountRepository accountRepository;
+    private AccountRepository accountRepository; // Injek Repo Account
 
     @Autowired
-    private HashedPassword hashedPassword; // Injected HashedPassword
+    private HashedPassword hashedPassword; // Injek Service Hash Password
 
     public String register(String username, String password, String nama_depan, String nama_belakang, String gender,
                            LocalDate birthdate, String birthplace, String phone, String email) {
 
-        // Check if the user or phone already exists
+        // Pengecekan Username Dan Password
         Optional<User> optionalUser = userRepository.findByUsername(username);
         Optional<Account> optionalEmail = accountRepository.findByPhone(phone);
 
@@ -41,10 +41,10 @@ public class RegisterAccount {
             return buildErrorResponse("No Telp Sudah Terdaftar");
         }
 
-        // Hash password using injected HashedPassword service
+        // Hash SHA 256 Password
         String hashedPasswordValue = hashedPassword.hashPassword(password);
 
-        // Create and save the User
+        // Save User Baru
         User user = new User();
         user.setUsername(username);
         user.setPassword(hashedPasswordValue);
@@ -52,12 +52,12 @@ public class RegisterAccount {
         user.setActive(1); // Default active status
         userRepository.save(user);
 
-        // Check if user is saved
+        // Validasi Jika User Berhasil Di Simpan
         if (!userRepository.findByUsername(username).isPresent()) {
             return buildErrorResponse("User Gagal Di Daftarkan");
         }
 
-        // Save the Account
+        // Kalo OK Save Akun
         Account account = new Account();
         account.setNamaDepan(nama_depan);
         account.setNamaBelakang(nama_belakang);
@@ -85,12 +85,12 @@ public class RegisterAccount {
         return tokenRepository.findByTokenAndInactiveIsNull(tokenStr).isPresent();
     }
 
-    // Helper method to build success response
+    // Susscess Builder
     private String buildSuccessResponse(String data) {
         return "{ \"status\": \"success\", \"data\": " + data + " }";
     }
 
-    // Helper method to build error response
+    // Error Builder
     private String buildErrorResponse(String message) {
         return "{ \"status\": \"error\", \"message\": \"" + message + "\" }";
     }

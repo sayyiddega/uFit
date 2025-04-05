@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 
 @Data
 @Entity
-@Table(name = "`user`") // pakai backtick karena "user" adalah reserved keyword
+@Table(name = "`user`") 
 public class User {
 
     @Id

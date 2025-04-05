@@ -33,10 +33,9 @@ public class AuthController {
         return authService.isTokenValid(token) ? "Token aktif" : "Token tidak valid";
     }
 
- // Register Endpoint
+
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody AccountRequest request) {
-        // Pass the request to RegisterAccount service
         String response = registerAccount.register(
             request.getUsername(),
             request.getPassword(),
@@ -49,11 +48,10 @@ public class AuthController {
             request.getEmail()
         );
 
-        // Return the response from the registration process
         if (response.contains("error")) {
-            return ResponseEntity.badRequest().body(response);  // Bad request for failure
+            return ResponseEntity.badRequest().body(response);
         }
-        return ResponseEntity.ok(response);  // Success response with token
+        return ResponseEntity.ok(response);
     }
 
     @Data

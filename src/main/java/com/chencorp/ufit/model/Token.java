@@ -15,7 +15,7 @@ public class Token {
     private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "`user`") // pakai backtick karena nama kolomnya "user"
+    @JoinColumn(name = "`user`") 
     private User user;
 
     private String token;

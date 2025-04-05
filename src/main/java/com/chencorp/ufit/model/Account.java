@@ -6,7 +6,7 @@ import java.time.LocalDate;
 
 @Data
 @Entity
-@Table(name = "`account`") // Use backticks as 'account' is a reserved keyword
+@Table(name = "`account`") 
 public class Account {
 
     @Id
