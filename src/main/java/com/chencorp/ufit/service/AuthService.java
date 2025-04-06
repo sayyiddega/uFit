@@ -2,7 +2,6 @@ package com.chencorp.ufit.service;
 
 import com.chencorp.ufit.model.Token;
 import com.chencorp.ufit.model.User;
-import com.chencorp.ufit.service.HashedPassword;
 import com.chencorp.ufit.repository.TokenRepository;
 import com.chencorp.ufit.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -47,6 +46,13 @@ public class AuthService {
         if (user.getEndDt() != null) {
             return buildErrorResponse("User account expired");
         }
+        if (user.getLogin() ==  1) {
+            return buildErrorResponse("Multiple Login");
+        }
+        
+        user.setLogin(1);
+        
+        userRepository.save(user);
 
         // Simpan token
         String tokenStr = UUID.randomUUID().toString();

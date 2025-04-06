@@ -24,4 +24,6 @@ public class User {
     private Integer active;
 
     private LocalDateTime endDt;
+
+    private Integer login;
 }

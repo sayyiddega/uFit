@@ -3,6 +3,7 @@ package com.chencorp.ufit.controller;
 
 import com.chencorp.ufit.service.AuthService;
 import com.chencorp.ufit.service.RegisterAccount;
+import com.chencorp.ufit.service.LogoutService;
 
 import lombok.Data;
 
@@ -21,6 +22,9 @@ public class AuthController {
 
     @Autowired
     private RegisterAccount registerAccount;
+
+    @Autowired
+    private LogoutService logoutService;
 
     @PostMapping("/login")
     public String login(@RequestBody LoginRequest request) {
@@ -54,6 +58,18 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
 
+    @PostMapping("/Logout")
+    public ResponseEntity<?> logout(@RequestBody LogoutRequest request) {
+        String response = logoutService.logout(
+            request.getUsername()
+        );
+
+        if (response.contains("error")) {
+            return ResponseEntity.badRequest().body(response);
+        }
+        return ResponseEntity.ok(response);
+    }
+
     @Data
     public static class LoginRequest {
         private String username;
@@ -72,5 +88,10 @@ public class AuthController {
         private String phone;
         private String email;
         private String user;
+    }
+
+    @Data
+    public static class LogoutRequest {
+        private String username;
     }
 }
