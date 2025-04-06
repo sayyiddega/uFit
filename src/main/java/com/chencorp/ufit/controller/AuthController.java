@@ -1,21 +1,22 @@
 package com.chencorp.ufit.controller;
 
 
-import com.chencorp.ufit.service.AuthService;
-import com.chencorp.ufit.service.RegisterAccount;
-import com.chencorp.ufit.service.UpdateAccount;
-import com.chencorp.ufit.service.LogoutService;
+import com.chencorp.ufit.service.Account.AllAcoount;
+import com.chencorp.ufit.service.Account.RegisterAccount;
+import com.chencorp.ufit.service.Account.UpdateAccount;
+import com.chencorp.ufit.service.Auth.AuthService;
+import com.chencorp.ufit.service.Auth.LogoutService;
 
 import lombok.Data;
-
-import java.time.LocalDate;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+
+
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/service")
 public class AuthController {
 
     @Autowired
@@ -30,6 +31,8 @@ public class AuthController {
     @Autowired
     private UpdateAccount updateAccount;
 
+    @Autowired
+    private AllAcoount allAcoount;
 
     @PostMapping("/login")
     public String login(@RequestBody LoginRequest request) {
@@ -42,7 +45,19 @@ public class AuthController {
         return authService.isTokenValid(token) ? "Token aktif" : "Token tidak valid";
     }
 
+    @PostMapping("/Logout")
+    public ResponseEntity<?> logout(@RequestBody LogoutRequest request) {
+        String response = logoutService.logout(
+            request.getUsername()
+        );
 
+        if (response.contains("error")) {
+            return ResponseEntity.badRequest().body(response);
+        }
+        return ResponseEntity.ok(response);
+    }
+
+    // ACCOUNT SECTION
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody AccountRequest request) {
         String response = registerAccount.register(
@@ -63,20 +78,8 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/Logout")
-    public ResponseEntity<?> logout(@RequestBody LogoutRequest request) {
-        String response = logoutService.logout(
-            request.getUsername()
-        );
-
-        if (response.contains("error")) {
-            return ResponseEntity.badRequest().body(response);
-        }
-        return ResponseEntity.ok(response);
-    }
-
     @PostMapping("/update_account")
-    public ResponseEntity<?> update_account(@RequestBody AccountRequest request) {
+    public ResponseEntity<?> updateAccount(@RequestBody AccountRequest request) {
         String response = updateAccount.updateAccount(
             request.getUsername(),
             request.getNama_depan(),
@@ -92,6 +95,16 @@ public class AuthController {
             return ResponseEntity.badRequest().body(response);
         }
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/getall_account")
+    public ResponseEntity<?> getall_account() {
+        return allAcoount.getAll(); // Directly call service's getAll() method
+    }
+
+    @GetMapping("/account/{id}")
+    public ResponseEntity<Object> getAccountById(@PathVariable Integer id) {
+        return allAcoount.getById(id);
     }
 
     @Data
@@ -111,7 +124,6 @@ public class AuthController {
         private String birthplace;
         private String phone;
         private String email;
-        private String user;
     }
 
     @Data

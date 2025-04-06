@@ -1,4 +1,4 @@
-package com.chencorp.ufit.service;
+package com.chencorp.ufit.service.Auth;
 
 import com.chencorp.ufit.model.Token;
 import com.chencorp.ufit.model.User;

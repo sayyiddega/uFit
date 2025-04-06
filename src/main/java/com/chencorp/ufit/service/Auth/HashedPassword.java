@@ -1,4 +1,4 @@
-package com.chencorp.ufit.service;
+package com.chencorp.ufit.service.Auth;
 
 import org.springframework.stereotype.Component;
 import java.security.MessageDigest;

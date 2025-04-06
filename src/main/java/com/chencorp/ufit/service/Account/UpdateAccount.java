@@ -1,98 +1,52 @@
-package com.chencorp.ufit.service;
+package com.chencorp.ufit.service.Account;
 
 import com.chencorp.ufit.model.Account;
-import com.chencorp.ufit.model.Token;
 import com.chencorp.ufit.model.User;
-import com.chencorp.ufit.repository.TokenRepository;
-import com.chencorp.ufit.repository.UserRepository;
 import com.chencorp.ufit.repository.AccountRepository;
+import com.chencorp.ufit.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
-public class RegisterAccount {
+public class UpdateAccount {
 
     @Autowired
-    private UserRepository userRepository; // Injek Repo User
+    private UserRepository userRepository;
 
     @Autowired
-    private TokenRepository tokenRepository; // Injek Repo Token
+    private AccountRepository accountRepository;
 
-    @Autowired
-    private AccountRepository accountRepository; // Injek Repo Account
-
-    @Autowired
-    private HashedPassword hashedPassword; // Injek Service Hash Password
-
-    public String register(String username, String password, String nama_depan, String nama_belakang, String gender,
+    public String updateAccount(String username,String nama_depan, String nama_belakang, String gender,
                            LocalDate birthdate, String birthplace, String phone, String email) {
-
-        // Pengecekan Username Dan Password
+        // Cek apakah pengguna ada di database
         Optional<User> optionalUser = userRepository.findByUsername(username);
-        Optional<Account> optionalEmail = accountRepository.findByPhone(phone);
 
-        if (optionalUser.isPresent()) {
-            return buildErrorResponse("User Sudah Terdaftar");
+        if (optionalUser.isEmpty()) {
+            return buildErrorResponse("User not found");
         }
-        if (optionalEmail.isPresent()) {
-            return buildErrorResponse("No Telp Sudah Terdaftar");
-        }
-
-        // Hash SHA 256 Password
-        String hashedPasswordValue = hashedPassword.hashPassword(password);
-
-        // Save User Baru
-        User user = new User();
-        user.setUsername(username);
-        user.setPassword(hashedPasswordValue);
-        user.setLevel(1); // Default level
-        user.setActive(1); // Default active status
-        user.setLogin(1);
-        userRepository.save(user);
-
-        // Validasi Jika User Berhasil Di Simpan
-        if (!userRepository.findByUsername(username).isPresent()) {
-            return buildErrorResponse("User Gagal Di Daftarkan");
-        }
-
-        // Kalo OK Save Akun
-        Account account = new Account();
+        
+        User user = optionalUser.get();
+        Integer UserId = user.getId();
+        Account account = accountRepository.findByUserId(UserId)  // Mengambil Account berdasarkan User
+                .orElseThrow(() -> new RuntimeException("Account not found"));
+        
         account.setNamaDepan(nama_depan);
         account.setNamaBelakang(nama_belakang);
         account.setGender(gender);
         account.setBirthdate(birthdate);
         account.setBirthplace(birthplace);
         account.setPhone(phone);
-        account.setEmail(email);
-        account.setUser(user);
+        account.setEmail(email);        
         accountRepository.save(account);
 
-        // Simpan token
-        String tokenStr = UUID.randomUUID().toString();
-        Token token = new Token();
-        token.setUser(user);
-        token.setToken(tokenStr);
-
-        // Mendapatkan timestamp saat ini
-        LocalDateTime currentDateTime = LocalDateTime.now();
-
-        // Menambahkan 1 hari
-        LocalDateTime nextDay = currentDateTime.plusDays(1);
-
-        // Set inactive to nextDay (LocalDateTime)
-        token.setInactive(nextDay);
-
-        // Simpan token ke repository
-        tokenRepository.save(token);
-
-        // Return response as JSON
-        JsonResponse response = new JsonResponse(username, nama_depan, nama_belakang, gender, birthdate, birthplace, phone, email, tokenStr);
+      // Return response as JSON
+        JsonResponse response = new JsonResponse(username, nama_depan, nama_belakang, gender, birthdate, birthplace, phone, email);
 
         try {
             ObjectMapper objectMapper = new ObjectMapper();
@@ -101,10 +55,6 @@ public class RegisterAccount {
             e.printStackTrace();
             return buildErrorResponse("Failed to generate response");
         }
-    }
-
-    public boolean isTokenValid(String tokenStr) {
-        return tokenRepository.findByTokenAndInactiveIsNull(tokenStr).isPresent();
     }
 
     // Susscess Builder
@@ -127,11 +77,11 @@ public class RegisterAccount {
         private String birthplace;
         private String phone;
         private String email;
-        private String token;
+      
 
         public JsonResponse(String username, String namaDepan, String namaBelakang,
                             String gender, LocalDate birthdate, String birthplace,
-                            String phone, String email, String tokenStr) {
+                            String phone, String email) {
             this.username = username;
             this.namaDepan = namaDepan;
             this.namaBelakang = namaBelakang;
@@ -141,7 +91,7 @@ public class RegisterAccount {
             this.birthplace = birthplace;
             this.phone = phone;
             this.email = email;
-            this.token = tokenStr;
+          
         }
 
         // Getter and setter methods
@@ -207,14 +157,6 @@ public class RegisterAccount {
 
         public void setEmail(String email) {
             this.email = email;
-        }
-
-        public String getToken() {
-            return token;
-        }
-
-        public void setToken(String tokenStr) {
-            this.token = tokenStr;
         }
         
     }

@@ -1,4 +1,6 @@
 package com.chencorp.ufit.model;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -6,7 +8,7 @@ import java.time.LocalDate;
 
 @Data
 @Entity
-@Table(name = "`account`") 
+@Table(name = "`account`")
 public class Account {
 
     @Id
@@ -36,5 +38,6 @@ public class Account {
 
     @ManyToOne
     @JoinColumn(name = "user", nullable = false)
+    @JsonIgnore // Ignore this field in the JSON response
     private User user;
 }
