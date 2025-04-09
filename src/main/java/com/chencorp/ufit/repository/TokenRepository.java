@@ -11,4 +11,5 @@ import com.chencorp.ufit.model.User;
 public interface TokenRepository extends JpaRepository<Token, Integer> {
     Optional<Token> findByTokenAndInactiveIsNull(String token);
     List<Token> findAllByUser(User user);
+    Token findByToken(String token);
 }
