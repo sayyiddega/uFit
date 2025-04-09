@@ -1,8 +1,6 @@
 package com.chencorp.ufit.service.MasterData.MasterGroup;
 
-import com.chencorp.ufit.model.Account;
 import com.chencorp.ufit.model.MasterGroup;
-import com.chencorp.ufit.model.User;
 import com.chencorp.ufit.repository.MasterGroupRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +20,6 @@ public class AddGroup {
         masterGroup.setActive(1);
         masterGroupRepository.save(masterGroup);
 
-        Optional<MasterGroup> optionalUser = masterGroupRepository.findByName(name);
         // Validasi Jika group  Berhasil Di Simpan
         if (!masterGroupRepository.findByName(name).isPresent()) {
             return buildErrorResponse("User Gagal Di Daftarkan");
