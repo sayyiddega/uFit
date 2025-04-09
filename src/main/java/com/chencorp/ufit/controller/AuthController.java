@@ -4,6 +4,8 @@ package com.chencorp.ufit.controller;
 import com.chencorp.ufit.service.Account.AllAcoount;
 import com.chencorp.ufit.service.Account.RegisterAccount;
 import com.chencorp.ufit.service.Account.UpdateAccount;
+import com.chencorp.ufit.service.MasterData.MasterGroup.AddGroup;
+import com.chencorp.ufit.service.MasterData.MasterGroup.GetGroup;
 import com.chencorp.ufit.service.Auth.AuthService;
 import com.chencorp.ufit.service.Auth.LogoutService;
 
@@ -33,6 +35,12 @@ public class AuthController {
 
     @Autowired
     private AllAcoount allAcoount;
+
+    @Autowired
+    private AddGroup addGroup;
+
+    @Autowired
+    private GetGroup getGroup;
 
     @PostMapping("/login")
     public String login(@RequestBody LoginRequest request) {
@@ -107,6 +115,45 @@ public class AuthController {
         return allAcoount.getById(id);
     }
 
+    //Master Data
+      // Master Group
+     // ACCOUNT SECTION
+     @PostMapping("/master/addgroup")
+     public ResponseEntity<?> addgroup(@RequestBody GroupRequest request) {
+         String response = addGroup.register(
+             request.getName()
+         );
+ 
+         if (response.contains("error")) {
+             return ResponseEntity.badRequest().body(response);
+         }
+         return ResponseEntity.ok(response);
+     }
+
+     @PostMapping("/master/updategroup")
+     public ResponseEntity<?> updateGroup(@RequestBody GroupRequest request) {
+         String response = addGroup.update(
+             request.getId(),
+             request.getName(),
+             request.getActive()
+         );
+ 
+         if (response.contains("error")) {
+             return ResponseEntity.badRequest().body(response);
+         }
+         return ResponseEntity.ok(response);
+     }
+
+     @GetMapping("/master/all_group")
+     public ResponseEntity<?> getall_group() {
+         return getGroup.getAll(); // Directly call service's getAll() method
+     }
+ 
+     @GetMapping("/master/group/{id}")
+     public ResponseEntity<Object> getGroupById(@PathVariable Integer id) {
+         return getGroup.getById(id);
+     }
+
     @Data
     public static class LoginRequest {
         private String username;
@@ -129,5 +176,12 @@ public class AuthController {
     @Data
     public static class LogoutRequest {
         private String username;
+    }
+
+    @Data
+    public static class GroupRequest {
+        private String name;
+        private Integer id;
+        private Integer active;
     }
 }
