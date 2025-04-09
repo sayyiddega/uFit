@@ -1,7 +1,6 @@
 package com.chencorp.ufit.service.MasterData.MasterGroup;
 
 import com.chencorp.ufit.model.MasterGroup;
-import com.chencorp.ufit.model.User;
 import com.chencorp.ufit.repository.MasterGroupRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,6 +82,7 @@ public class AddGroup {
             this.id = id;
             this.active = active;
         }
+        
 
         // Getter and setter methods
         public String getName() {
